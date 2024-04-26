@@ -1,0 +1,19 @@
+﻿@page
+<div class="container flex flex-col w-full items-center">
+   <div class="flex space-x-4">
+        <h1 id="welcome-user">Hello User!</h1>
+        <h1 id="current-session">Not in session!</h1>
+       </div>
+    <h1 class="text-3xl font-semibold">Lijst met sessies</h1>
+
+    <div class="grid grid-cols-3 gap-4 mt-6 w-fit" id="session_list">
+    </div>
+    <div class="first-child:mr-4 mt-6 space-x-4">
+        <button class="text-white p-2 w-48 rounded-xl bg-blue-600" id="create_session">Create Session</button>
+        <button class="text-white p-2 w-48 rounded-xl bg-blue-600" id="join_session">Join Session</button>
+        <button class="text-white p-2 w-48 rounded-xl bg-blue-600 disabled:bg-blue-600/40" id="leave_session" disabled>Leave Session</button>
+    </div>
+</div>
+<div id="alert-container" class="absolute right-0 bottom-0 z-10"></div>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/ttt.js"></script>

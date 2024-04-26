@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Classes\SessionManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\js\chat.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Classes\NewFile.txt" />
+    <None Remove="Pages\NewFile.txt" />
+  </ItemGroup>
+
+</Project>

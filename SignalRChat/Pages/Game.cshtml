@@ -1,0 +1,121 @@
+﻿@page "/game/{slug?}"
+@model SignalRChat.Pages.GameModel
+
+<div id="board" class="flex divide-x-4 divide-black text-4xl text-center">
+    <div class="divide-y-4 divide-black">
+        @for (int i = 0; i < 3; i++)
+        {
+            <div onclick="makeMove(@i)" class="size-32 hokje align-middle"></div>
+        }
+   </div>
+    <div class="divide-y-4 divide-black">
+        @for (int i = 3; i < 6; i++)
+        {
+            <div onclick="makeMove(@i)" class="size-32 hokje align-middle"></div>
+        }
+    </div>
+    <div class="divide-y-4 divide-black">
+        @for (int i = 6; i < 9; i++)
+        {
+            <div onclick="makeMove(@i)" class="size-32 hokje align-middle"></div>
+        }
+    </div>
+</div>
+
+
+<button class="text-white p-2 w-48 rounded-xl bg-blue-600 disabled:bg-blue-600/40" id="leave_session" onclick="leaveSession()">Leave Session</button>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script>
+    var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+    const username = localStorage.getItem("username");
+
+    connection.on("updateBoard", function (session, board) {
+        const boardDiv = document.getElementById('board');
+        connection.invoke("getSessionFromUser", username).catch(function (err) {
+            return console.error(err.toString());
+        }).then((e) => {
+            const sess = e;
+            if (sess == null) {
+                return;
+            }
+
+            console.log("session is not null");
+
+            if (sess.name == session.name) {
+                boardDiv.querySelectorAll('.hokje').forEach((div, index) => {
+                    console.log("boardUpdate", div, index)
+                    div.innerHTML = board[index];
+                });
+            }
+        })
+    });
+
+    connection.on("gameOver", function (session, result) {
+        console.log("gameOver event called");
+        connection.invoke("getSessionFromUser", username).catch(function (err) {
+            return console.error(err.toString());
+        }).then((e) => {
+            console.log('deleting session');
+            const sess = e;
+            if (sess == null) {
+                return;
+            }
+            console.log("session is not null");
+
+            if (sess.name == session.name) {
+                alert(result);
+
+                connection.invoke("deleteSession", session.name).catch(function (err) {
+                    return console.error(err.toString());
+                });
+
+                    window.location.href = "/";
+            }
+        })
+    });
+
+    connection.start().then(() => {
+        connection.invoke("fetchBoard", "@Model.Slug").catch(function (err) {
+            return console.error(err.toString());
+        }).then((e) => {
+            if (e.success) {
+                console.log("u r gae") // <--- keep dis
+            } else if (e.success === false) {
+                window.location.href = "/";
+            }
+        }) 
+        
+        
+    }).catch(function (err) {
+        return console.error(err.toString());
+    });
+
+
+    function leaveSession() {
+        connection.invoke("getSessionFromUser", username).catch(function (err) {
+            return console.error(err.toString());
+        }).then((e) => {
+            console.log('deleting session');
+            const sess = e;
+            if (sess == null) {
+                return;
+            }
+            
+            connection.invoke("gameOver", sess.name, "Opponent left").catch(function (err) {
+                return console.error(err.toString());
+            }).then((e) => {
+                console.log(e);
+            });
+        })
+    }
+
+    function makeMove(position) {
+        connection.invoke("makeMove", '@Model.Slug', position, username).catch(function (err) {
+            return console.error(err.toString());
+        }).then((e) => {
+            console.log("successfull");
+            console.log(e)
+        })
+    }
+</script>
